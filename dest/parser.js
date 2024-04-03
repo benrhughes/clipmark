@@ -45,6 +45,7 @@ const fs = __importStar(require("fs"));
 const readline = __importStar(require("readline"));
 function parseClippings(filePath) {
     var _a, e_1, _b, _c;
+    var _d, _e;
     return __awaiter(this, void 0, void 0, function* () {
         const numberPattern = /\s+(\d+)/;
         const titleAuthorPattern = /^(.*?)\s*\(([^)]+)\)$/;
@@ -55,9 +56,9 @@ function parseClippings(filePath) {
         let current = new model_1.Clipping();
         let lineNum = 0;
         try {
-            for (var _d = true, rl_1 = __asyncValues(rl), rl_1_1; rl_1_1 = yield rl_1.next(), _a = rl_1_1.done, !_a; _d = true) {
+            for (var _f = true, rl_1 = __asyncValues(rl), rl_1_1; rl_1_1 = yield rl_1.next(), _a = rl_1_1.done, !_a; _f = true) {
                 _c = rl_1_1.value;
-                _d = false;
+                _f = false;
                 const line = _c;
                 if (!line) {
                     continue;
@@ -89,7 +90,7 @@ function parseClippings(filePath) {
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
         finally {
             try {
-                if (!_d && !_a && (_b = rl_1.return)) yield _b.call(rl_1);
+                if (!_f && !_a && (_b = rl_1.return)) yield _b.call(rl_1);
             }
             finally { if (e_1) throw e_1.error; }
         }
@@ -112,6 +113,22 @@ function parseClippings(filePath) {
         }
         for (const book of Object.values(lookup)) {
             book.clippings = book.clippings.sort((a, b) => a.location - b.location);
+            // detect duplicates - and keep the longer one
+            for (let i = 0; i < book.clippings.length; i++) {
+                const curr = book.clippings[i];
+                const next = book.clippings[i + 1];
+                if (!curr || !next) {
+                    continue;
+                }
+                if (curr.location === next.location && curr.clippingType == next.clippingType) {
+                    if ((((_d = curr.content) === null || _d === void 0 ? void 0 : _d.length) || 0) < (((_e = next.content) === null || _e === void 0 ? void 0 : _e.length) || 0)) {
+                        book.clippings.splice(i, 1);
+                    }
+                    else {
+                        book.clippings.splice(i + 1, 1);
+                    }
+                }
+            }
         }
         return Object.values(lookup);
     });

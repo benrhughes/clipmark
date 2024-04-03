@@ -70,6 +70,24 @@ export async function parseClippings(filePath: string): Promise<Book[]> {
     
     for(const book of Object.values(lookup)){
         book.clippings = book.clippings.sort((a,b) => a.location - b.location);
+
+        // detect duplicates - and keep the longer one
+        for(let i = 0; i < book.clippings.length; i++){
+            const curr = book.clippings[i];
+            const next = book.clippings[i+1];
+
+            if(!curr || !next){ 
+                continue;
+            }
+
+            if(curr.location === next.location && curr.clippingType == next.clippingType){
+                if((curr.content?.length || 0) < (next.content?.length || 0)){
+                    book.clippings.splice(i, 1);
+                } else {
+                    book.clippings.splice(i+1, 1);
+                }
+            }
+        }
     }
 
     return Object.values(lookup);
