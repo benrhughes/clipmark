@@ -113,14 +113,15 @@ function parseClippings(filePath) {
         }
         for (const book of Object.values(lookup)) {
             book.clippings = book.clippings.sort((a, b) => a.location - b.location);
-            // detect duplicates - and keep the longer one
+            // detect duplicates 
             for (let i = 0; i < book.clippings.length; i++) {
                 const curr = book.clippings[i];
                 const next = book.clippings[i + 1];
                 if (!curr || !next) {
                     continue;
                 }
-                if (curr.location === next.location && curr.clippingType == next.clippingType) {
+                // when we two highlight clippings with the same (start) location, delete the shorter one
+                if (curr.location === next.location && curr.clippingType === model_1.ClippingType.highlight && next.clippingType === model_1.ClippingType.highlight) {
                     if ((((_d = curr.content) === null || _d === void 0 ? void 0 : _d.length) || 0) < (((_e = next.content) === null || _e === void 0 ? void 0 : _e.length) || 0)) {
                         book.clippings.splice(i, 1);
                     }

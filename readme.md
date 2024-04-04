@@ -1,4 +1,4 @@
-# Kindle Clippings to Markdown converter
+# ClipMark - convert Kindle clippings to markdown
 
 Kindle devices store a user's notes and highlights in a single file called `My Clippings.txt`. It has content for all books, whether Amazon-purchased or side-loaded. It is just a single, flat text file with clippings from all books intermingled, which can make referencing your clippings difficult. 
 

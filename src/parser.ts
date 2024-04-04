@@ -48,6 +48,7 @@ export async function parseClippings(filePath: string): Promise<Book[]> {
         lineNum++;
     }
 
+    // group the clippings by book
     var lookup: { [key: string]: Book } = {};
 
     for (const clip of clippings) {
@@ -67,11 +68,10 @@ export async function parseClippings(filePath: string): Promise<Book[]> {
         book.clippings.push(clip);
     }
 
-    
+    // sort the clippings by location and remove duplicate highlights
     for(const book of Object.values(lookup)){
         book.clippings = book.clippings.sort((a,b) => a.location - b.location);
 
-        // detect duplicates - and keep the longer one
         for(let i = 0; i < book.clippings.length; i++){
             const curr = book.clippings[i];
             const next = book.clippings[i+1];
@@ -80,7 +80,8 @@ export async function parseClippings(filePath: string): Promise<Book[]> {
                 continue;
             }
 
-            if(curr.location === next.location && curr.clippingType == next.clippingType){
+            // when we find two highlight clippings with the same (start) location, delete the shorter one
+            if(curr.location === next.location && curr.clippingType === ClippingType.highlight && next.clippingType === ClippingType.highlight){
                 if((curr.content?.length || 0) < (next.content?.length || 0)){
                     book.clippings.splice(i, 1);
                 } else {
