@@ -9,7 +9,7 @@ ClipMark is a very simple nodejs app which
 - attempts to remove duplicate highlights
 - generates a markdown file per book 
 
-NB: this only works for physical Kindle devices. Apps on various other platforms do no produce a `My Clippings.txt` file.
+NB: this only works for physical Kindle devices. Apps on various other platforms do not produce a `My Clippings.txt` file.
 
 ## Running
 ### Prerequisites
@@ -18,6 +18,7 @@ NB: this only works for physical Kindle devices. Apps on various other platforms
 - the "My Clippings.txt" file from a Kindle device
 
 
+### Run
 To run ClipMark, you only require the files in the `dest` folder. Download them, then run:
 
 ```
@@ -29,11 +30,12 @@ A folder called `clippings` will be created in the current directory, and a file
 **NB** existing files will be overwritten.
 
 ## Building
-### Prerequisits
+### Prerequisites
 - git
 - nodejs v18+
 - typescript (`npm install -g typescript`)
 
+### Build
 ```
 $> git clone https://github.com/benrhughes/clipmark.git
 $> cd clipmark
