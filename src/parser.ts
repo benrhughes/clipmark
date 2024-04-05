@@ -21,7 +21,7 @@ export async function parseClippings(filePath: string): Promise<Book[]> {
         if (line === clippingSeparator) {
             if(!current.header) { continue; } // can't add a clipping if we couldn't extract a header value
 
-            let book = tryAdd(booksByHeader, current.header, x => new Book(x));
+            let book = getOrAdd(booksByHeader, current.header, x => new Book(x));
             book.clippings.push(current);
 
             current = new Clipping();
@@ -68,7 +68,7 @@ export async function parseClippings(filePath: string): Promise<Book[]> {
             if(curr.location === next.location && curr.clippingType === ClippingType.highlight && next.clippingType === ClippingType.highlight){
                 if((curr.content?.length || 0) < (next.content?.length || 0)){
                     book.clippings.splice(i, 1);
-                    i--; // we need to process this index again, because will now contains the value that was in i+1
+                    i--; // we need to process this index again, because it now contains the value that was in i+1
                 } else {
                     book.clippings.splice(i+1, 1);
                 }
@@ -79,7 +79,7 @@ export async function parseClippings(filePath: string): Promise<Book[]> {
     return Object.values(booksByHeader);
 }
 
-function tryAdd<T>(lookup: { [key: string]: T }, key: string, addFn : (key: string) => T) {
+function getOrAdd<T>(lookup: { [key: string]: T }, key: string, addFn : (key: string) => T) {
     let t = lookup[key];
     if(!t){
         t = addFn(key);
