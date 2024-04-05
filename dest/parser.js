@@ -48,11 +48,10 @@ function parseClippings(filePath) {
     var _d, _e;
     return __awaiter(this, void 0, void 0, function* () {
         const numberPattern = /\s+(\d+)/;
-        const titleAuthorPattern = /^(.*?)\s*\(([^)]+)\)$/;
-        const separator = '==========';
+        const clippingSeparator = '==========';
         const stream = fs.createReadStream(filePath);
         const rl = readline.createInterface(stream);
-        const clippings = [];
+        var booksByHeader = {};
         let current = new model_1.Clipping();
         let lineNum = 0;
         try {
@@ -63,8 +62,12 @@ function parseClippings(filePath) {
                 if (!line) {
                     continue;
                 }
-                if (line === separator) {
-                    clippings.push(current);
+                if (line === clippingSeparator) {
+                    if (!current.header) {
+                        continue;
+                    } // can't add a clipping if we couldn't extract a header value
+                    let book = tryAdd(booksByHeader, current.header, x => new model_1.Book(x));
+                    book.clippings.push(current);
                     current = new model_1.Clipping();
                     lineNum = 0;
                     continue;
@@ -94,36 +97,20 @@ function parseClippings(filePath) {
             }
             finally { if (e_1) throw e_1.error; }
         }
-        var lookup = {};
-        for (const clip of clippings) {
-            if (clip.header === undefined) {
-                continue;
-            }
-            let book = lookup[clip.header];
-            if (!book) {
-                book = new model_1.Book();
-                const match = clip.header.match(titleAuthorPattern);
-                if (match) {
-                    book.title = match[1].trim();
-                    book.author = match[2].trim();
-                }
-                lookup[clip.header] = book;
-            }
-            book.clippings.push(clip);
-        }
-        for (const book of Object.values(lookup)) {
+        // sort the clippings by location and remove duplicate highlights
+        for (const book of Object.values(booksByHeader)) {
             book.clippings = book.clippings.sort((a, b) => a.location - b.location);
-            // detect duplicates 
             for (let i = 0; i < book.clippings.length; i++) {
                 const curr = book.clippings[i];
                 const next = book.clippings[i + 1];
                 if (!curr || !next) {
                     continue;
                 }
-                // when we two highlight clippings with the same (start) location, delete the shorter one
+                // when we find two highlight clippings with the same (start) location, delete the shorter one
                 if (curr.location === next.location && curr.clippingType === model_1.ClippingType.highlight && next.clippingType === model_1.ClippingType.highlight) {
                     if ((((_d = curr.content) === null || _d === void 0 ? void 0 : _d.length) || 0) < (((_e = next.content) === null || _e === void 0 ? void 0 : _e.length) || 0)) {
                         book.clippings.splice(i, 1);
+                        i--; // we need to process this index again, because will now contains the value that was in i+1
                     }
                     else {
                         book.clippings.splice(i + 1, 1);
@@ -131,7 +118,15 @@ function parseClippings(filePath) {
                 }
             }
         }
-        return Object.values(lookup);
+        return Object.values(booksByHeader);
     });
 }
 exports.parseClippings = parseClippings;
+function tryAdd(lookup, key, addFn) {
+    let t = lookup[key];
+    if (!t) {
+        t = addFn(key);
+        lookup[key] = t;
+    }
+    return t;
+}

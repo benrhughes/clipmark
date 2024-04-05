@@ -13,8 +13,16 @@ export enum ClippingType {
 }
 
 export class Book {
+    static titleAuthorPattern = /^(.*?)\s*\(([^)]+)\)$/;
     title: string | undefined;
     author: string | undefined;
     clippings: Clipping[] = [];
 
+    constructor(header: string){
+        const match = header.match(Book.titleAuthorPattern);
+        if (match) {
+            this.title = match[1].trim();
+            this.author = match[2].trim();
+        }
+    }
 }

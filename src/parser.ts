@@ -4,13 +4,13 @@ import * as readline from 'readline';
 
 export async function parseClippings(filePath: string): Promise<Book[]> {
     const numberPattern = /\s+(\d+)/;
-    const titleAuthorPattern = /^(.*?)\s*\(([^)]+)\)$/;
-    const separator = '==========';
+    const clippingSeparator = '==========';
 
     const stream = fs.createReadStream(filePath);
     const rl = readline.createInterface(stream);
 
-    const clippings: Clipping[] = [];
+    var booksByHeader: { [key: string]: Book } = {};
+
     let current = new Clipping();
     let lineNum = 0;
     for await (const line of rl) {
@@ -18,8 +18,12 @@ export async function parseClippings(filePath: string): Promise<Book[]> {
             continue;
         }
 
-        if (line === separator) {
-            clippings.push(current);
+        if (line === clippingSeparator) {
+            if(!current.header) { continue; } // can't add a clipping if we couldn't extract a header value
+
+            let book = tryAdd(booksByHeader, current.header, x => new Book(x));
+            book.clippings.push(current);
+
             current = new Clipping();
             lineNum = 0;
             continue;
@@ -48,28 +52,8 @@ export async function parseClippings(filePath: string): Promise<Book[]> {
         lineNum++;
     }
 
-    // group the clippings by book
-    var lookup: { [key: string]: Book } = {};
-
-    for (const clip of clippings) {
-        if (clip.header === undefined) { continue; }
-
-        let book = lookup[clip.header];
-        if (!book) {
-            book = new Book();
-            const match = clip.header.match(titleAuthorPattern);
-            if(match){
-                book.title = match[1].trim();
-                book.author = match[2].trim();
-            }
-            lookup[clip.header] = book;
-        }
-
-        book.clippings.push(clip);
-    }
-
     // sort the clippings by location and remove duplicate highlights
-    for(const book of Object.values(lookup)){
+    for(const book of Object.values(booksByHeader)){
         book.clippings = book.clippings.sort((a,b) => a.location - b.location);
 
         for(let i = 0; i < book.clippings.length; i++){
@@ -84,6 +68,7 @@ export async function parseClippings(filePath: string): Promise<Book[]> {
             if(curr.location === next.location && curr.clippingType === ClippingType.highlight && next.clippingType === ClippingType.highlight){
                 if((curr.content?.length || 0) < (next.content?.length || 0)){
                     book.clippings.splice(i, 1);
+                    i--; // we need to process this index again, because will now contains the value that was in i+1
                 } else {
                     book.clippings.splice(i+1, 1);
                 }
@@ -91,5 +76,15 @@ export async function parseClippings(filePath: string): Promise<Book[]> {
         }
     }
 
-    return Object.values(lookup);
+    return Object.values(booksByHeader);
+}
+
+function tryAdd<T>(lookup: { [key: string]: T }, key: string, addFn : (key: string) => T) {
+    let t = lookup[key];
+    if(!t){
+        t = addFn(key);
+        lookup[key] = t;
+    }
+
+    return t;
 }
