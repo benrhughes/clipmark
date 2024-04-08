@@ -19,10 +19,10 @@ NB: this only works for physical Kindle devices. Apps on various other platforms
 
 
 ### Run
-To run ClipMark, you only require the files in the `dest` folder. Download them, then run:
+To run ClipMark, you only require the files in the `app` folder. Download them, then run:
 
 ```
-$> node dest/app.js path/to/My\ Clippings.txt
+$> node app/clipmark.js path/to/My\ Clippings.txt
 ```
 
 A folder called `clippings` will be created in the current directory, and a file will be created there for each book that has clippings. 

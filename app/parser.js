@@ -66,7 +66,7 @@ function parseClippings(filePath) {
                     if (!current.header) {
                         continue;
                     } // can't add a clipping if we couldn't extract a header value
-                    let book = tryAdd(booksByHeader, current.header, x => new model_1.Book(x));
+                    let book = getOrAdd(booksByHeader, current.header, x => new model_1.Book(x));
                     book.clippings.push(current);
                     current = new model_1.Clipping();
                     lineNum = 0;
@@ -110,7 +110,7 @@ function parseClippings(filePath) {
                 if (curr.location === next.location && curr.clippingType === model_1.ClippingType.highlight && next.clippingType === model_1.ClippingType.highlight) {
                     if ((((_d = curr.content) === null || _d === void 0 ? void 0 : _d.length) || 0) < (((_e = next.content) === null || _e === void 0 ? void 0 : _e.length) || 0)) {
                         book.clippings.splice(i, 1);
-                        i--; // we need to process this index again, because will now contains the value that was in i+1
+                        i--; // we need to process this index again, because it now contains the value that was in i+1
                     }
                     else {
                         book.clippings.splice(i + 1, 1);
@@ -122,7 +122,7 @@ function parseClippings(filePath) {
     });
 }
 exports.parseClippings = parseClippings;
-function tryAdd(lookup, key, addFn) {
+function getOrAdd(lookup, key, addFn) {
     let t = lookup[key];
     if (!t) {
         t = addFn(key);
