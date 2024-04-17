@@ -1,5 +1,4 @@
 import path from "path";
-import { toMarkdown } from "./mkd";
 import { parseClippings } from "./parser";
 const fs = require('fs').promises;
 const invalidChars = /[<>:"/\\|?*\x00-\x1F]/g;
@@ -16,7 +15,7 @@ async function main() {
 
     await fs.mkdir(outputDir, { recursive: true });
     for (const book of books) {
-        const mkd = toMarkdown(book);
+        const mkd = book.toMarkdown();
         
         const fileName = `${book.author} - ${book.title}.md`.replace(invalidChars, '');
         const filePath = path.join(outputDir, fileName);

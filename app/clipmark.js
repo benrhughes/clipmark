@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = __importDefault(require("path"));
-const mkd_1 = require("./mkd");
 const parser_1 = require("./parser");
 const fs = require('fs').promises;
 const invalidChars = /[<>:"/\\|?*\x00-\x1F]/g;
@@ -28,7 +27,7 @@ function main() {
         var books = yield (0, parser_1.parseClippings)(inputFile);
         yield fs.mkdir(outputDir, { recursive: true });
         for (const book of books) {
-            const mkd = (0, mkd_1.toMarkdown)(book);
+            const mkd = book.toMarkdown();
             const fileName = `${book.author} - ${book.title}.md`.replace(invalidChars, '');
             const filePath = path_1.default.join(outputDir, fileName);
             yield fs.writeFile(filePath, mkd, 'utf8');
