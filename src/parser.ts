@@ -81,7 +81,7 @@ export async function parseClippings(filePath: string): Promise<Book[]> {
 
 function getOrAdd<T>(lookup: { [key: string]: T }, key: string, addFn : (key: string) => T) {
     let t = lookup[key];
-    if(!t){
+    if(t === undefined){
         t = addFn(key);
         lookup[key] = t;
     }

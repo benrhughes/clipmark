@@ -124,7 +124,7 @@ function parseClippings(filePath) {
 exports.parseClippings = parseClippings;
 function getOrAdd(lookup, key, addFn) {
     let t = lookup[key];
-    if (!t) {
+    if (t === undefined) {
         t = addFn(key);
         lookup[key] = t;
     }
