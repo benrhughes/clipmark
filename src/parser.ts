@@ -44,6 +44,9 @@ export async function parseClippings(filePath: string): Promise<Book[]> {
                 match = parts[1].match(numberPattern);
                 current.location = match ? +match[1] : 0;
 
+                const dtString = parts[2]?.replace('Added on ', '');
+                current.createdDate = new Date(dtString);
+
                 break;
             default:
                 current.content = current.content ? current.content += line : line;

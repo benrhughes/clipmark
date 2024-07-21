@@ -45,7 +45,7 @@ const fs = __importStar(require("fs"));
 const readline = __importStar(require("readline"));
 function parseClippings(filePath) {
     var _a, e_1, _b, _c;
-    var _d, _e;
+    var _d, _e, _f;
     return __awaiter(this, void 0, void 0, function* () {
         const numberPattern = /\s+(\d+)/;
         const clippingSeparator = '==========';
@@ -55,9 +55,9 @@ function parseClippings(filePath) {
         let current = new model_1.Clipping();
         let lineNum = 0;
         try {
-            for (var _f = true, rl_1 = __asyncValues(rl), rl_1_1; rl_1_1 = yield rl_1.next(), _a = rl_1_1.done, !_a; _f = true) {
+            for (var _g = true, rl_1 = __asyncValues(rl), rl_1_1; rl_1_1 = yield rl_1.next(), _a = rl_1_1.done, !_a; _g = true) {
                 _c = rl_1_1.value;
-                _f = false;
+                _g = false;
                 const line = _c;
                 if (!line) {
                     continue;
@@ -83,6 +83,8 @@ function parseClippings(filePath) {
                         current.page = match ? +match[1] : undefined;
                         match = parts[1].match(numberPattern);
                         current.location = match ? +match[1] : 0;
+                        const dtString = (_d = parts[2]) === null || _d === void 0 ? void 0 : _d.replace('Added on ', '');
+                        current.createdDate = new Date(dtString);
                         break;
                     default:
                         current.content = current.content ? current.content += line : line;
@@ -93,7 +95,7 @@ function parseClippings(filePath) {
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
         finally {
             try {
-                if (!_f && !_a && (_b = rl_1.return)) yield _b.call(rl_1);
+                if (!_g && !_a && (_b = rl_1.return)) yield _b.call(rl_1);
             }
             finally { if (e_1) throw e_1.error; }
         }
@@ -108,7 +110,7 @@ function parseClippings(filePath) {
                 }
                 // when we find two highlight clippings with the same (start) location, delete the shorter one
                 if (curr.location === next.location && curr.clippingType === model_1.ClippingType.highlight && next.clippingType === model_1.ClippingType.highlight) {
-                    if ((((_d = curr.content) === null || _d === void 0 ? void 0 : _d.length) || 0) < (((_e = next.content) === null || _e === void 0 ? void 0 : _e.length) || 0)) {
+                    if ((((_e = curr.content) === null || _e === void 0 ? void 0 : _e.length) || 0) < (((_f = next.content) === null || _f === void 0 ? void 0 : _f.length) || 0)) {
                         book.clippings.splice(i, 1);
                         i--; // we need to process this index again, because it now contains the value that was in i+1
                     }

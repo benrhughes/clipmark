@@ -21,8 +21,26 @@ class Book {
             this.author = match[2].trim();
         }
     }
+    dateString() {
+        const first = this.clippings[0].createdDate;
+        const last = this.clippings[this.clippings.length - 1].createdDate;
+        let val = '';
+        if (first) {
+            val = `*${first.toLocaleDateString('en-GB')}`;
+        }
+        if (first && last) {
+            val += ` - ${last.toLocaleDateString('en-GB')}*`;
+        }
+        else if (last) {
+            val = `*${last.toLocaleDateString('en-GB')}*`;
+        }
+        else {
+            val += '*';
+        }
+        return val;
+    }
     toMarkdown() {
-        var s = `# ${this.title} - ${this.author}\n`;
+        var s = `# ${this.title} - ${this.author}\n\n${this.dateString()}\n\n`;
         let page = 0;
         let location = 0;
         for (const clip of this.clippings) {
