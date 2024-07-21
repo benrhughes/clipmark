@@ -11,6 +11,24 @@ ClipMark is a very simple nodejs app which
 
 NB: this only works for physical Kindle devices. Apps on various other platforms do not produce a `My Clippings.txt` file.
 
+## Example output
+```
+# The Hour of the Star - Clarice Lispector
+
+*28/05/2024 - 02/06/2024*
+
+## Page 9
+### Location 131
+> Make no mistake, I only achieve simplicity with enormous effort.
+
+### Location 138
+> Happiness? I never saw a dumber word, invented by all those northeastern girls out there.
+
+## Page 13
+### Location 191
+> The person I’m going to talk about is so dumb that she sometimes smiles at other people on the street.
+```
+
 ## Running
 ### Prerequisites
 
